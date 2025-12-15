@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Manajemen Absensi - STMIK IKMI Cirebon</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="https://ikmi.ac.id/wp-content/uploads/2020/09/cropped-favicon-32x32.png">
+</head>
+<body>
+    <!-- Container Utama -->
+    <div class="container" id="main-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo-container">
+                <img src="image/logo.png" alt="Logo STMIK IKMI Cirebon" class="logo">
+                <div class="header-text">
+                    <h1>Sistem Manajemen Absensi</h1>
+                    <h2>STMIK IKMI Cirebon</h2>
+                </div>
+            </div>
+            <div class="user-info" id="user-info">
+                <span id="username-display">Belum login</span>
+                <button id="logout-btn" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </header>
+
+        <!-- Container untuk login dan aplikasi utama -->
+        <div id="login-container" class="login-container">
+            <div class="login-box">
+                <h2><i class="fas fa-user-graduate"></i> Login Sistem</h2>
+                <p>Silakan masuk dengan akun Anda</p>
+                
+                <div class="form-group">
+                    <label for="username"><i class="fas fa-user"></i> Username</label>
+                    <input type="text" id="username" placeholder="Masukkan username">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password"><i class="fas fa-lock"></i> Password</label>
+                    <input type="password" id="password" placeholder="Masukkan password">
+                </div>
+                
+                <div class="form-group">
+                    <label for="role"><i class="fas fa-user-tag"></i> Peran</label>
+                    <select id="role">
+                        <option value="admin">Admin</option>
+                        <option value="dosen">Dosen</option>
+                        <option value="mahasiswa">Mahasiswa</option>
+                    </select>
+                </div>
+                
+                <button id="login-btn" class="btn-login"><i class="fas fa-sign-in-alt"></i> Masuk</button>
+                
+                <div class="demo-credentials">
+                    <p><strong>Kredensial Demo:</strong></p>
+                    <p>Admin: admin / admin123</p>
+                    <p>Dosen: dosen / dosen123</p>
+                    <p>Mahasiswa: 202101001 / mhs123</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Aplikasi Utama (disembunyikan sampai login) -->
+        <div id="app-container" class="app-container hidden">
+            <!-- Sidebar Navigasi -->
+            <nav class="sidebar">
+                <ul class="nav-menu">
+                    <li class="nav-item active" data-page="dashboard">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </li>
+                    <li class="nav-item" data-page="mahasiswa">
+                        <i class="fas fa-users"></i>
+                        <span>Data Mahasiswa</span>
+                    </li>
+                    <li class="nav-item" data-page="absensi">
+                        <i class="fas fa-clipboard-check"></i>
+                        <span>Absensi</span>
+                    </li>
+                    <li class="nav-item" data-page="laporan">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Laporan</span>
+                    </li>
+                    <li class="nav-item" data-page="pengaturan">
+                        <i class="fas fa-cog"></i>
+                        <span>Pengaturan</span>
+                    </li>
+                </ul>
+                
+                <div class="sidebar-footer">
+                    <div class="status-indicator">
+                        <div class="status-dot connected"></div>
+                        <span id="db-status">Terhubung ke Database</span>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Konten Utama -->
+            <main class="main-content">
+                <!-- Dashboard -->
+                <div id="dashboard-page" class="page active">
+                    <div class="page-header">
+                        <h2><i class="fas fa-home"></i> Dashboard</h2>
+                        <p id="current-date">Selamat datang di Sistem Manajemen Absensi STMIK IKMI Cirebon</p>
+                    </div>
+                    
+                    <div class="cards-container">
+                        <div class="card">
+                            <div class="card-icon total-mahasiswa">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="card-content">
+                                <h3>Total Mahasiswa</h3>
+                                <p id="total-mahasiswa">0</p>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-icon absensi-hari-ini">
+                                <i class="fas fa-clipboard-check"></i>
+                            </div>
+                            <div class="card-content">
+                                <h3>Absensi Hari Ini</h3>
+                                <p id="absensi-hari-ini">0</p>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-icon total-kelas">
+                                <i class="fas fa-chalkboard-teacher"></i>
+                            </div>
+                            <div class="card-content">
+                                <h3>Total Kelas</h3>
+                                <p id="total-kelas">0</p>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-icon kehadiran-rate">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="card-content">
+                                <h3>Rata-rata Kehadiran</h3>
+                                <p id="rata-kehadiran">0%</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="content-row">
+                        <div class="content-col">
+                            <div class="content-box">
+                                <h3><i class="fas fa-calendar-day"></i> Absensi Terbaru</h3>
+                                <div class="table-container">
+                                    <table id="recent-absensi-table">
+                                        <thead>
+                                            <tr>
+                                                <th>NIM</th>
+                                                <th>Nama</th>
+                                                <th>Kelas</th>
+                                                <th>Status</th>
+                                                <th>Waktu</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- Data akan dimuat dari JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="content-col">
+                            <div class="content-box">
+                                <h3><i class="fas fa-user-plus"></i> Mahasiswa Terdaftar Baru</h3>
+                                <div class="table-container">
+                                    <table id="new-mahasiswa-table">
+                                        <thead>
+                                            <tr>
+                                                <th>NIM</th>
+                                                <th>Nama</th>
+                                                <th>Kelas</th>
+                                                <th>Program Studi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- Data akan dimuat dari JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Data Mahasiswa -->
+                <div id="mahasiswa-page" class="page">
+                    <div class="page-header">
+                        <h2><i class="fas fa-users"></i> Data Mahasiswa</h2>
+                        <div class="page-actions">
+                            <button id="add-mahasiswa-btn" class="btn-primary"><i class="fas fa-user-plus"></i> Tambah Mahasiswa</button>
+                            <button id="refresh-mahasiswa-btn" class="btn-secondary"><i class="fas fa-sync-alt"></i> Refresh</button>
+                        </div>
+                    </div>
+                    
+                    <div class="content-box">
+                        <div class="table-controls">
+                            <div class="search-box">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="search-mahasiswa" placeholder="Cari berdasarkan NIM atau nama...">
+                            </div>
+                            <div class="filter-box">
+                                <select id="filter-kelas">
+                                    <option value="">Semua Kelas</option>
+                                    <!-- Opsi kelas akan dimuat dari JavaScript -->
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="table-container">
+                            <table id="mahasiswa-table">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>NIM</th>
+                                        <th>Nama Lengkap</th>
+                                        <th>Kelas</th>
+                                        <th>Program Studi</th>
+                                        <th>Semester</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Data akan dimuat dari JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="table-footer">
+                            <div id="mahasiswa-pagination" class="pagination">
+                                <!-- Pagination akan dibuat di JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Absensi -->
+                <div id="absensi-page" class="page">
+                    <div class="page-header">
+                        <h2><i class="fas fa-clipboard-check"></i> Absensi</h2>
+                        <div class="page-actions">
+                            <button id="take-absensi-btn" class="btn-primary"><i class="fas fa-qrcode"></i> Ambil Absensi</button>
+                            <button id="filter-absensi-btn" class="btn-secondary"><i class="fas fa-filter"></i> Filter</button>
+                        </div>
+                    </div>
+                    
+                    <div class="content-box">
+                        <div class="absensi-controls">
+                            <div class="control-group">
+                                <label for="absensi-kelas">Pilih Kelas:</label>
+                                <select id="absensi-kelas">
+                                    <option value="">Pilih Kelas</option>
+                                    <!-- Opsi kelas akan dimuat dari JavaScript -->
+                                </select>
+                            </div>
+                            <div class="control-group">
+                                <label for="absensi-mata-kuliah">Mata Kuliah:</label>
+                                <select id="absensi-mata-kuliah">
+                                    <option value="">Pilih Mata Kuliah</option>
+                                    <option value="Pemrograman Web">Pemrograman Web</option>
+                                    <option value="Basis Data">Basis Data</option>
+                                    <option value="Algoritma">Algoritma</option>
+                                    <option value="Struktur Data">Struktur Data</option>
+                                    <option value="Jaringan Komputer">Jaringan Komputer</option>
+                                </select>
+                            </div>
+                            <div class="control-group">
+                                <label for="absensi-tanggal">Tanggal:</label>
+                                <input type="date" id="absensi-tanggal" value="">
+                            </div>
+                            <div class="control-group">
+                                <button id="load-absensi-btn" class="btn-primary"><i class="fas fa-search"></i> Tampilkan</button>
+                            </div>
+                        </div>
+                        
+                        <div class="table-container">
+                            <table id="absensi-table">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>NIM</th>
+                                        <th>Nama</th>
+                                        <th>Status</th>
+                                        <th>Keterangan</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Data akan dimuat dari JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="absensi-actions">
+                            <button id="save-absensi-btn" class="btn-success"><i class="fas fa-save"></i> Simpan Absensi</button>
+                            <button id="reset-absensi-btn" class="btn-secondary"><i class="fas fa-redo"></i> Reset</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Laporan -->
+                <div id="laporan-page" class="page">
+                    <div class="page-header">
+                        <h2><i class="fas fa-chart-bar"></i> Laporan</h2>
+                        <div class="page-actions">
+                            <button id="export-laporan-btn" class="btn-primary"><i class="fas fa-file-export"></i> Export Laporan</button>
+                            <button id="print-laporan-btn" class="btn-secondary"><i class="fas fa-print"></i> Cetak</button>
+                        </div>
+                    </div>
+                    
+                    <div class="content-box">
+                        <div class="laporan-controls">
+                            <div class="control-group">
+                                <label for="laporan-bulan">Bulan:</label>
+                                <select id="laporan-bulan">
+                                    <option value="1">Januari</option>
+                                    <option value="2">Februari</option>
+                                    <option value="3">Maret</option>
+                                    <option value="4">April</option>
+                                    <option value="5">Mei</option>
+                                    <option value="6">Juni</option>
+                                    <option value="7">Juli</option>
+                                    <option value="8">Agustus</option>
+                                    <option value="9">September</option>
+                                    <option value="10">Oktober</option>
+                                    <option value="11">November</option>
+                                    <option value="12">Desember</option>
+                                </select>
+                            </div>
+                            <div class="control-group">
+                                <label for="laporan-tahun">Tahun:</label>
+                                <select id="laporan-tahun">
+                                    <!-- Tahun akan dimuat dari JavaScript -->
+                                </select>
+                            </div>
+                            <div class="control-group">
+                                <label for="laporan-kelas">Kelas:</label>
+                                <select id="laporan-kelas">
+                                    <option value="">Semua Kelas</option>
+                                    <!-- Opsi kelas akan dimuat dari JavaScript -->
+                                </select>
+                            </div>
+                            <div class="control-group">
+                                <button id="generate-laporan-btn" class="btn-primary"><i class="fas fa-chart-bar"></i> Generate Laporan</button>
+                            </div>
+                        </div>
+                        
+                        <div id="laporan-content">
+                            <div class="laporan-summary">
+                                <h3>Ringkasan Kehadiran</h3>
+                                <div class="summary-cards">
+                                    <div class="summary-card">
+                                        <h4>Hadir</h4>
+                                        <p id="summary-hadir">0</p>
+                                    </div>
+                                    <div class="summary-card">
+                                        <h4>Izin</h4>
+                                        <p id="summary-izin">0</p>
+                                    </div>
+                                    <div class="summary-card">
+                                        <h4>Sakit</h4>
+                                        <p id="summary-sakit">0</p>
+                                    </div>
+                                    <div class="summary-card">
+                                        <h4>Alpha</h4>
+                                        <p id="summary-alpha">0</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="laporan-detail">
+                                <h3>Detail Kehadiran</h3>
+                                <div class="table-container">
+                                    <table id="laporan-table">
+                                        <thead>
+                                            <tr>
+                                                <th>NIM</th>
+                                                <th>Nama</th>
+                                                <th>Kelas</th>
+                                                <th>Hadir</th>
+                                                <th>Izin</th>
+                                                <th>Sakit</th>
+                                                <th>Alpha</th>
+                                                <th>Persentase</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- Data laporan akan dimuat dari JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pengaturan -->
+                <div id="pengaturan-page" class="page">
+                    <div class="page-header">
+                        <h2><i class="fas fa-cog"></i> Pengaturan</h2>
+                    </div>
+                    
+                    <div class="content-box">
+                        <div class="settings-tabs">
+                            <div class="tab-buttons">
+                                <button class="tab-btn active" data-tab="account">Akun Pengguna</button>
+                                <button class="tab-btn" data-tab="system">Sistem</button>
+                                <button class="tab-btn" data-tab="about">Tentang</button>
+                            </div>
+                            
+                            <div class="tab-content">
+                                <!-- Tab Akun Pengguna -->
+                                <div id="account-tab" class="tab-pane active">
+                                    <h3><i class="fas fa-user-cog"></i> Pengaturan Akun</h3>
+                                    <div class="form-settings">
+                                        <div class="form-group">
+                                            <label for="setting-username">Username</label>
+                                            <input type="text" id="setting-username" value="admin" disabled>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="setting-password">Password Baru</label>
+                                            <input type="password" id="setting-password" placeholder="Masukkan password baru">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="setting-confirm-password">Konfirmasi Password</label>
+                                            <input type="password" id="setting-confirm-password" placeholder="Konfirmasi password baru">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="setting-role">Peran</label>
+                                            <select id="setting-role" disabled>
+                                                <option value="admin">Admin</option>
+                                                <option value="dosen">Dosen</option>
+                                                <option value="mahasiswa">Mahasiswa</option>
+                                            </select>
+                                        </div>
+                                        <button id="save-account-btn" class="btn-primary"><i class="fas fa-save"></i> Simpan Perubahan</button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Tab Sistem -->
+                                <div id="system-tab" class="tab-pane">
+                                    <h3><i class="fas fa-sliders-h"></i> Pengaturan Sistem</h3>
+                                    <div class="form-settings">
+                                        <div class="form-group">
+                                            <label for="setting-institution">Nama Institusi</label>
+                                            <input type="text" id="setting-institution" value="STMIK IKMI Cirebon">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="setting-timeout">Waktu Timeout (menit)</label>
+                                            <input type="number" id="setting-timeout" value="30" min="5" max="120">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="setting-records">Jumlah Data per Halaman</label>
+                                            <input type="number" id="setting-records" value="10" min="5" max="50">
+                                        </div>
+                                        <div class="form-group checkbox-group">
+                                            <input type="checkbox" id="setting-notifications" checked>
+                                            <label for="setting-notifications">Aktifkan Notifikasi</label>
+                                        </div>
+                                        <div class="form-group checkbox-group">
+                                            <input type="checkbox" id="setting-darkmode">
+                                            <label for="setting-darkmode">Mode Gelap</label>
+                                        </div>
+                                        <button id="save-system-btn" class="btn-primary"><i class="fas fa-save"></i> Simpan Pengaturan</button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Tab Tentang -->
+                                <div id="about-tab" class="tab-pane">
+                                    <h3><i class="fas fa-info-circle"></i> Tentang Aplikasi</h3>
+                                    <div class="about-content">
+                                        <div class="about-logo">
+                                            <img src="https://ikmi.ac.id/wp-content/uploads/2020/06/Logo-IKMI-Cirebon-1024x1024.png" alt="Logo STMIK IKMI Cirebon">
+                                        </div>
+                                        <div class="about-text">
+                                            <h4>Sistem Manajemen Absensi Mahasiswa</h4>
+                                            <p><strong>Versi:</strong> 1.0.0</p>
+                                            <p><strong>Dikembangkan untuk:</strong> STMIK IKMI Cirebon</p>
+                                            <p><strong>Deskripsi:</strong> Sistem ini dibuat untuk mempermudah proses pencatatan absensi mahasiswa secara digital dengan integrasi database cloud.</p>
+                                            <p><strong>Teknologi:</strong> HTML, CSS, JavaScript, Supabase</p>
+                                            <p><strong>Pengembang:</strong> Tim Pengembangan STMIK IKMI Cirebon</p>
+                                            <p><strong>Kontak:</strong> info@ikmi.ac.id</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- Modal untuk tambah/edit mahasiswa -->
+        <div id="mahasiswa-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3><i class="fas fa-user-plus"></i> <span id="modal-title">Tambah Mahasiswa</span></h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="mahasiswa-form">
+                        <input type="hidden" id="mahasiswa-id">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="modal-nim">NIM <span class="required">*</span></label>
+                                <input type="text" id="modal-nim" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="modal-nama">Nama Lengkap <span class="required">*</span></label>
+                                <input type="text" id="modal-nama" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="modal-kelas">Kelas <span class="required">*</span></label>
+                                <select id="modal-kelas" required>
+                                    <option value="">Pilih Kelas</option>
+                                    <option value="TI-1A">TI-1A</option>
+                                    <option value="TI-1B">TI-1B</option>
+                                    <option value="TI-2A">TI-2A</option>
+                                    <option value="TI-2B">TI-2B</option>
+                                    <option value="TI-3A">TI-3A</option>
+                                    <option value="TI-3B">TI-3B</option>
+                                    <option value="SI-1A">SI-1A</option>
+                                    <option value="SI-1B">SI-1B</option>
+                                    <option value="SI-2A">SI-2A</option>
+                                    <option value="SI-2B">SI-2B</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="modal-prodi">Program Studi <span class="required">*</span></label>
+                                <select id="modal-prodi" required>
+                                    <option value="">Pilih Program Studi</option>
+                                    <option value="Teknik Informatika">Teknik Informatika</option>
+                                    <option value="Sistem Informasi">Sistem Informasi</option>
+                                    <option value="Manajemen Informatika">Manajemen Informatika</option>
+                                    <option value="Komputerisasi Akuntansi">Komputerisasi Akuntansi</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="modal-semester">Semester <span class="required">*</span></label>
+                                <select id="modal-semester" required>
+                                    <option value="">Pilih Semester</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                    <option value="6">6</option>
+                                    <option value="7">7</option>
+                                    <option value="8">8</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="modal-email">Email</label>
+                                <input type="email" id="modal-email">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="modal-telepon">No. Telepon</label>
+                                <input type="text" id="modal-telepon">
+                            </div>
+                            <div class="form-group">
+                                <label for="modal-status">Status</label>
+                                <select id="modal-status">
+                                    <option value="Aktif">Aktif</option>
+                                    <option value="Tidak Aktif">Tidak Aktif</option>
+                                    <option value="Cuti">Cuti</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button id="cancel-mahasiswa-btn" class="btn-secondary">Batal</button>
+                    <button id="save-mahasiswa-btn" class="btn-primary">Simpan</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal untuk konfirmasi -->
+        <div id="confirm-modal" class="modal">
+            <div class="modal-content confirm-modal">
+                <div class="modal-header">
+                    <h3><i class="fas fa-exclamation-triangle"></i> Konfirmasi</h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p id="confirm-message">Apakah Anda yakin ingin menghapus data ini?</p>
+                </div>
+                <div class="modal-footer">
+                    <button id="confirm-cancel" class="btn-secondary">Batal</button>
+                    <button id="confirm-ok" class="btn-danger">Ya, Hapus</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal untuk QR Code -->
+        <div id="qr-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3><i class="fas fa-qrcode"></i> Absensi QR Code</h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="qr-container">
+                        <div id="qr-code"></div>
+                        <p class="qr-instruction">Scan QR Code ini untuk melakukan absensi</p>
+                        <div class="qr-info">
+                            <p><strong>Kelas:</strong> <span id="qr-kelas">TI-1A</span></p>
+                            <p><strong>Mata Kuliah:</strong> <span id="qr-matkul">Pemrograman Web</span></p>
+                            <p><strong>Tanggal:</strong> <span id="qr-tanggal">12/10/2023</span></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="generate-qr-btn" class="btn-primary">Generate QR Baru</button>
+                    <button id="close-qr-btn" class="btn-secondary">Tutup</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; 2025 STMIK IKMI Cirebon. Sistem Manajemen Absensi Mahasiswa.</p>
+            <p>Versi 1.0.0 | <span id="last-updated">Terakhir diperbarui: -</span></p>
+        </footer>
+    </div>
+
+    <!-- Toast Notifikasi -->
+    <div id="toast-container"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <script src="supabase-config.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
